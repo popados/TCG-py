@@ -1,4 +1,6 @@
 from ast import While
+import sys
+import time
 import random
 from unittest import case
 from deckFire.cards.allCards import Flamestrike, Imp
@@ -78,11 +80,28 @@ def shuffleDeck(deck):
 def createHand(deck):
     for i in range(3):
         hand.append(deck.pop(i))
-        print("drew card: %s" %hand[i].cardName)
-        print("card: %s" %hand[i].printCard())
-
+        print(f"drew card: {hand[i].cardName}")
     return hand
 
+def selectCard(hand):
+    try:
+        for i in range(len(hand)):
+            print("cards in hand: %s %s" %(i + 1, hand[i].cardName))
+            selection = input ("play card %s: %s? (y/n) " %(i + 1, hand[i].cardName))
+            if selection == "y":
+                print("card %s: %s" %(i + 1, hand[i].cardName))
+                lifeCount = playCardWithMutation(hand[i])
+                hand.pop(i)
+                print("")
+            if selection != "y":
+                print("press y to play a card")
+                print("card %s: %s not played" %(i + 1, hand[i].cardName))
+                print("")
+    except ValueError:
+        print("Invalid input. Please enter 'y' or 'n'.")
+    except IndexError:
+        selectCard(hand)
+        
 def turnCounter(deck):
     createDeck(deck)
     shuffleDeck(deck)
@@ -99,14 +118,9 @@ def turnCounter(deck):
             if playerOneTurn == True:
                 print("p1 turn: %s" %(turnCount + 1))
                 input("1 mana added, press enter")
+                print("")
                 # card selection function 
-                for i in range(len(hand)):
-                    print("cards in hand: %s %s" %(i + 1, hand[i].cardName))
-                    selection = input ("play card %s: %s? (y/n) " %(i + 1, hand[i].cardName))
-                    if selection == "y":
-                        print("card %s: %s" %(i + 1, hand[i].cardName))
-                        lifeCount = playCardWithMutation(hand[i])
-                        print("")
+                selectCard(hand) 
                 # lifeCount = playCardWithMutation(hand[0])
                 print("")
                 # print("player one")
@@ -116,7 +130,7 @@ def turnCounter(deck):
                 # return lifeCount
             if playerTwoTurn == True:
                 print("p2 turn: %s" %(turnCount + 1))
-                input("1 mana added, press enter")
+                input("1 mana added")
                 print("")
                 # print("player two")
                 # input("press enter")
@@ -129,9 +143,16 @@ def turnCounter(deck):
             print("game over")
     # return lifeCount
         # lifeCount -= 1
-turnCounter(deck)
+
+try:
+    turnCounter(deck)
+    print("deck size: %s" %len(deck))
+except KeyboardInterrupt:
+    print("")
+    print("")
+    print("Game interrupted by user.")
+    sys.exit(0)
 # print("life count: %s" %lifeCount)
-print("deck size: %s" %len(deck))
 # print("deck card 1: %s" %deck[0].cardName)
 
 
