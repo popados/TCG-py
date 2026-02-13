@@ -60,6 +60,26 @@ draw hand
 play card
 field
 
+***
+
+### Day 003 | 02/12/2026 - Thursday
+
+In order the steps
+
+- Shuffle
+- First Hand
+- Draw
+- Main Phase(play spell or creature cards)
+- Attack Phase(attack with cards on field)
+- End Phase
+
+maybe set up client-server interactions
+
+clean up the selection process for cards
+
+remove/add mana
+
+card abilities
 
 ***
 
