@@ -17,12 +17,12 @@ class Imp(Card):
         print ("attack: %s" %self.attack)
         print ("health: %s" %self.health)
         print ("cost: %s" %self.cost)
-        print("---")
 
     def playCard(self, lifeCount):
         lifeCount -= 5
         input("Imp played!")
         print("Life: %s" %lifeCount)
+        print("---")
         return lifeCount
 
 class Drake(Card):
@@ -46,6 +46,7 @@ class Drake(Card):
         lifeCount -= 3
         input("Drake played!")
         print("Life: %s" %lifeCount)
+        print("---")
         return lifeCount
 
 class Fireball(Card):
@@ -69,6 +70,7 @@ class Fireball(Card):
         lifeCount -= 3
         input("Fireball played!")
         print("Life: %s" %lifeCount)
+        print("---")
         return lifeCount
 
 class Flamestrike(Card):
@@ -92,6 +94,7 @@ class Flamestrike(Card):
         lifeCount -= 3
         input("Flamestrike played!")
         print("Life: %s" %lifeCount)
+        print("---")
         return lifeCount
 
 class SpiiritOfFire(Card):
@@ -115,6 +118,7 @@ class SpiiritOfFire(Card):
         lifeCount -= 3
         input("Spirit of Fire played!")
         print("Life: %s" %lifeCount)
+        print("---")
         return lifeCount
 
 class Wildfire(Card):
@@ -138,6 +142,7 @@ class Wildfire(Card):
         lifeCount -= 3
         input("Wildfire played!")
         print("Life: %s" %lifeCount)
+        print("---")
         return lifeCount
 
 class Cerberus(Card):
@@ -161,4 +166,5 @@ class Cerberus(Card):
         lifeCount -= 3
         input("Cerberus played!")
         print("Life: %s" %lifeCount)
+        print("---")
         return lifeCount

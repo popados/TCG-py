@@ -81,6 +81,32 @@ remove/add mana
 
 card abilities
 
+```Markdown
+I'll add a small plan (todo list) then create two files: server.py and client.py implementing a simple TCP room server (max 2 players) and a command-line client.
+
+Created server.py and client.py files
+Progress update: created a simple TCP room server and a CLI client; next I can add README instructions and polish the protocol.
+
+What I added
+
+File: server.py — multithreaded TCP server hosting rooms (max 2 clients). Commands: JOIN room|name, PLAY payload, LEAVE, QUIT. Forwards PLAY to the other player in the room and sends room/ready notifications.
+File: client.py — interactive CLI client. Use join <room_id> <name>, play <payload>, leave, quit.
+How to try it
+
+Start the server:
+
+python server.py
+In two different terminals run the client:
+
+python client.py# then at the prompt, e.g.:join room1 Alice# in the other client:join room1 Bob# when both ready, send:play CARD 1
+Next steps I can do (pick any):
+
+Finish TODO item: add README usage notes and examples.
+Integrate the client with your existing game code so the client sends actual game actions (draw, play card) and server relays game state.
+Use WebSockets or higher-level networking for reliability and easier message handling.
+Which should I do next
+```
+
 ***
 
 ## End of Document

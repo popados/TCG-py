@@ -46,6 +46,12 @@ class Card:
         print("health: %s" % self.health)
         print("cost: %s" % self.cost)
 
+    def playCard(self, lifeCount):
+        lifeCount -= 3
+        input("Placeholder Card played!")
+        print("Life: %s" %lifeCount)
+        print("---")
+        return lifeCount
 
 # card = Card()
 # card.printCard()

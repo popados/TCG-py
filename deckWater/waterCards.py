@@ -17,12 +17,12 @@ class WaterSerpent(Card):
         print ("attack: %s" %self.attack)
         print ("health: %s" %self.health)
         print ("cost: %s" %self.cost)
-        print("---")
 
     def playCard(self, lifeCount):
         lifeCount -= 5
-        input("Imp played!")
+        input("Water Serpent played!")
         print("Life: %s" %lifeCount)
+        print("---")
         return lifeCount
 
 class Mino(Card):
@@ -44,8 +44,9 @@ class Mino(Card):
 
     def playCard(self, lifeCount):
         lifeCount -= 3
-        input("Drake played!")
+        input("Mino played!")
         print("Life: %s" %lifeCount)
+        print("---")
         return lifeCount
 
 class WaterSpout(Card):
@@ -67,8 +68,9 @@ class WaterSpout(Card):
 
     def playCard(self, lifeCount):
         lifeCount -= 3
-        input("Fireball played!")
+        input("Water Spout played!")
         print("Life: %s" %lifeCount)
+        print("---")
         return lifeCount
 
 class Monsoon(Card):
@@ -90,8 +92,9 @@ class Monsoon(Card):
 
     def playCard(self, lifeCount):
         lifeCount -= 3
-        input("Flamestrike played!")
+        input("Monsoon played!")
         print("Life: %s" %lifeCount)
+        print("---")
         return lifeCount
 
 class WaterSpirite(Card):
@@ -113,14 +116,15 @@ class WaterSpirite(Card):
 
     def playCard(self, lifeCount):
         lifeCount -= 3
-        input("Spirit of Fire played!")
+        input("Water Sprite played!")
         print("Life: %s" %lifeCount)
+        print("---")
         return lifeCount
 
-class Wildfire(Card):
+class TidalWave(Card):
     def __init__(self):
         super().__init__()
-        self.cardName = "Wildfire"
+        self.cardName = "Tidal Wave"
         self.attack = 4
         self.health = 0
         self.cost = 3
@@ -136,8 +140,9 @@ class Wildfire(Card):
 
     def playCard(self, lifeCount):
         lifeCount -= 3
-        input("Wildfire played!")
+        input("Tidal Wave played!")
         print("Life: %s" %lifeCount)
+        print("---")
         return lifeCount
 
 class Crash(Card):
@@ -159,6 +164,7 @@ class Crash(Card):
 
     def playCard(self, lifeCount):
         lifeCount -= 3
-        input("Cerberus played!")
+        input("Crash played!")
         print("Life: %s" %lifeCount)
+        print("---")
         return lifeCount

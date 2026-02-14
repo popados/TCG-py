@@ -1,13 +1,13 @@
 from ast import While
 import sys
-import time
+import os
 import random
 from unittest import case
 from deckFire.fireCards import Flamestrike, Imp
 from deckFire.fireCards import Drake, Wildfire
 from deckFire.fireCards import Fireball, Cerberus, SpiiritOfFire
 from deckWater.waterCards import Crash, Monsoon, WaterSpirite, WaterSerpent
-from deckWater.waterCards import WaterSpout, WaterSerpent, Mino
+from deckWater.waterCards import WaterSpout, Mino, TidalWave
 
 from player.card import Card
 
@@ -27,6 +27,14 @@ turns
 - attack phase [x]
 - end phase [x]
 
+turn--
+commander object
+card object
+select card
+play card
+end turn
+
+
 add a draw phase and return to the hand and ask for another selection when the does not select a card to play. Allow player to play cards until they select to end their turn.
 ---
 decks
@@ -34,18 +42,24 @@ cards
 hand
 field
 """
-lifeCount = 20
+p1LifeCount = 20
+p2LifeCount = 20
 fireDeck = []
 waterDeck = []
 fireHand = []
 waterHand = []
+fireField = []
+waterField = []
 field = []
 # shuffledDeck = []
+def clear():
+    os.system("cls" if os.name == "nt" else "clear")
 
 
-def playCardWithMutation(card):
+
+def playCardWithMutation(card, lifeCount):
     """Play a card and mutate the global lifeCount variable"""
-    global lifeCount
+    # global p1LifeCount
     lifeCount = card.playCard(lifeCount)
     return lifeCount
 
@@ -69,7 +83,7 @@ def createWaterDeck(waterDeck):
         waterDeck.append(WaterSpirite())
         waterDeck.append(Crash())
         waterDeck.append(Mino())
-        waterDeck.append(Monsoon())
+        waterDeck.append(TidalWave())
     return waterDeck
 
 def shuffleDeck(deck):
@@ -114,7 +128,7 @@ def selectCard(hand):
                 elif hand[i].cardType == "Spell":
                     print("")
                     print("spell %s: %s played" %(i + 1, hand[i].cardName))
-                    playCardWithMutation(hand[i])
+                    playCardWithMutation(hand[i], p2LifeCount)  # Assuming for fire player
                     hand.pop(i)
                     continue
                 hand.pop(i)
@@ -132,17 +146,97 @@ def selectCard(hand):
     except IndexError:
         selectCard(hand)
 
+def cardToPlay(hand, lifeCount, field):
+    while True:
+        print("cards in hand: ")
+        for i in range(len(hand)):
+            print(f"{i + 1}: {hand[i].cardName} (Mana: {hand[i].cost})")
+        selection = input("Select a card to play (type the number). 0 = End Turn\n").strip()
+        if not selection.isdigit():
+            print("Please enter a number.")
+            continue
+        idx = int(selection)
+        if idx == 0:
+            print("Ending turn.")
+            return lifeCount
+        if 1 <= idx <= len(hand):
+            card = hand[idx - 1]
+            if card.cardType == "Creature":
+                field.append(card)
+                print(f"Played creature: {card.cardName}")
+            elif card.cardType == "Spell":
+                print(f"Played spell: {card.cardName}")
+                lifeCount = playCardWithMutation(card, lifeCount)
+            hand.pop(idx - 1)
+            return lifeCount
+        print("Invalid selection. Please try again.")
+
+def handMenu(hand):
+    """Show a numbered menu for the given hand and return the selected card or None for End Turn.
+
+    0 -> End Turn
+    1..N -> select corresponding card in hand
+    """
+    while True:
+        # clear()
+        print("Select a card to play (type the number). 0 = End Turn\n")
+        for i, card in enumerate(hand, start=1):
+            cost = getattr(card, "cost", "?")
+            print(f"{i}: {card.cardName} (Mana: {cost})")
+        print("9: Show Field")
+        print("0: End Turn")
+
+        choice = input("Choice: ").strip()
+        if not choice:
+            continue
+        if not choice.isdigit():
+            print("Please enter a number.")
+            input("Press Enter to continue...")
+            continue
+        idx = int(choice)
+        if idx == 0:
+            return None
+        if idx == 9:
+            print("field: %s" %field)
+        if 1 <= idx <= len(hand):
+            return hand[idx - 1]
+        print("Invalid selection.")
+        input("Press Enter to continue...")
+
+def attackPhase(field, opponentLife):
+    if not field:
+        print("No creatures to attack with.")
+        return opponentLife
+    print(":::Attack phase displaying field:::")
+    print("Select a creature to attack with (type the number). 0 = Skip Attack\n")
+    for i, card in enumerate(field, start=1):
+        print(f"{i}: {card.cardName} (Attack: {card.attack})")
+    choice = input("Choice: ").strip()
+    if not choice or not choice.isdigit():
+        print("Skipping attack.")
+        return opponentLife
+    idx = int(choice)
+    if idx == 0:
+        print("Skipping attack.")
+        return opponentLife
+    if 1 <= idx <= len(field):
+        attacker = field[idx - 1]
+        damage = attacker.attack
+        opponentLife -= damage
+        print(f"{attacker.cardName} attacks for {damage} damage! Opponent life: {opponentLife}")
+        return opponentLife
+    print("Invalid selection.")
+    return opponentLife
+
 def turnCounter(fireDeck, waterDeck):
     createFireDeck(fireDeck)
     createWaterDeck(waterDeck)
     
     shuffleDeck(fireDeck)
     shuffleDeck(waterDeck)
-    global lifeCount
+    global p1LifeCount, p2LifeCount
     turnCount = 0
     manaCount = 1
-    playerTwoTurn = False
-    playerOneTurn = True
     gameStart = True
     fireHand = createHand(fireDeck)
     print("fire hand created")
@@ -150,42 +244,41 @@ def turnCounter(fireDeck, waterDeck):
     waterHand = createHand(waterDeck)
     print("water hand created")
     print("")
-    # hand = createHand(deck)
-    # if lifeCount > 0:
     while gameStart == True:
-        if lifeCount >= 0:
-            if playerOneTurn == True:
-                print("p1 turn: %s" %(turnCount + 1))
-                input("1 mana added: %s mana total" %(manaCount))
+        if p1LifeCount > 0:
+            print("--Round %s: %s mana added" %(turnCount + 1, manaCount))
+            print("")
+            # Fire player's turn
+            while True:
+                print("**Fire player's turn**")
                 print("")
-                # card selection function 
-                selectCard(fireHand)
-                drawCard(fireDeck, fireHand)
-                # lifeCount = playCardWithMutation(hand[0])
+                print("---Life: %s - Turn %s" %(p1LifeCount, turnCount + 1))
+                p2LifeCount = cardToPlay(fireHand, p2LifeCount, fireField)
+                p2LifeCount = attackPhase(fireField, p2LifeCount)
+                break
+            drawCard(fireDeck, fireHand)
+            print("")
+        if p2LifeCount > 0:
+        # Water player's turn
+            while True:
+                print("**Water player's turn**")
                 print("")
-                # print("player one")
-                # input("press enter to next player")
-                playerOneTurn = False
-                playerTwoTurn = True
-                # return lifeCount
-            if playerTwoTurn == True:
-                # p2manaCount = turnCount + 1
-                print("p2 turn: %s" %(turnCount + 1))
-                input("1 mana added: %s mana total" %(manaCount))
-                print("")
-                selectCard(waterHand)
-                drawCard(waterDeck, waterHand)
-                print("")
-                # print("player two")
-                # input("press enter")
-                playerTwoTurn = False
-                playerOneTurn = True
-            manaCount += 1
-            turnCount += 1
-        # return lifeCount
-        if lifeCount <= 0:
+                print("---Life: %s - Turn %s" %(p2LifeCount, turnCount + 1))
+                p1LifeCount = cardToPlay(waterHand, p1LifeCount, waterField)
+                p1LifeCount = attackPhase(waterField, p1LifeCount)
+                break
+            drawCard(waterDeck, waterHand)
+            print("")
+        manaCount += 1
+        turnCount += 1
+        print(f"Round ended. New round: {turnCount + 1}, Mana per player: {manaCount}")
+        print("")
+        if p1LifeCount <= 0:
             gameStart = False
-            print("game over")
+            print("game over p2 wins")
+        if p2LifeCount <= 0:
+            gameStart = False
+            print("game over p1 wins")
     # return lifeCount
         # lifeCount -= 1
 
@@ -195,6 +288,8 @@ try:
     print("")
     print("hello")
     input("press enter")
+    # print("")
+    # handMenu(fireHand)
     print("")
     turnCounter(fireDeck, waterDeck)
     # print("deck size: %s" %len(deck))
