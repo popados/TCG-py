@@ -23,9 +23,33 @@ import socket
 import sys
 import threading
 import traceback
+import os
+import logging
+import datetime
 
 HOST = '0.0.0.0'
 PORT = 9000
+
+LOGS_DIR = 'server_logs'
+
+if not os.path.exists(LOGS_DIR):
+    os.makedirs(LOGS_DIR)
+
+# Create a new log file with timestamp
+LOG_FILENAME = os.path.join(LOGS_DIR, f"server_{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.log")
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='[%(asctime)s] %(message)s',
+    datefmt='%Y-%m-%d %H:%M:%S',
+    handlers=[
+        logging.FileHandler(LOG_FILENAME),
+        logging.StreamHandler(sys.stdout)
+    ]
+)
+logger = logging.getLogger(__name__)
+
 
 # Pre-create three rooms for clients to join
 rooms = {
@@ -213,7 +237,7 @@ def main():
             try:
                 while True:
                     with rooms_lock:
-                        print('\n--- Server Rooms Status ---')
+                        print('\n--- Server Rooms Status --- %s ---' % datetime.datetime.now().strftime('%m/%d/%Y:%H:%M:%S'))
                         for rid, room in rooms.items():
                             names = [c.get('name') for c in room.get('clients', [])]
                             print(f"{rid}: {len(names)}/2 connected - {names}")
@@ -283,4 +307,4 @@ if __name__ == '__main__':
         main()
     except KeyboardInterrupt:
         print("\nServer shutting down...")
-        sys.exit(0)
+    sys.exit(0)
