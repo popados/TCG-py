@@ -83,7 +83,9 @@ def selectCardMenu(hand, sock, state):
         bool: True if a card was selected, False if End Turn
     """
     while True:
+        available_mana = state.get('mana_available', 0)
         print("\n=== Your Hand ===")
+        print(f"Available Mana: {available_mana}")
         for i, card in enumerate(hand, start=1):
             attack = getattr(card, "attack", "?")
             health = getattr(card, "health", "?")
@@ -105,14 +107,20 @@ def selectCardMenu(hand, sock, state):
         
         if 1 <= idx <= len(hand):
             selected_card = hand[idx - 1]
+            card_cost = getattr(selected_card, "cost", 0)
+            if card_cost > available_mana:
+                print(f"Not enough mana to play {selected_card.cardName}. Need {card_cost}, have {available_mana}.")
+                continue
             card_info = f"CARD {idx-1} {selected_card.cardName} {selected_card.cardType} {selected_card.attack} {selected_card.health} {selected_card.cost}"
             try:
                 sock.sendall((f"PLAY {card_info}\n").encode())
                 print(f"[YOU] Played: {selected_card.cardName}")
+                state['mana_available'] = max(0, available_mana - card_cost)
                 if selected_card.cardType == "Creature":
                     print(f"--> {selected_card.cardName} summoned to the field!")
                     field = state.get('field', [])
                     field.append(selected_card)
+                hand.pop(idx - 1)
             except Exception as e:
                 print(f"Error sending card selection: {e}")
             return True

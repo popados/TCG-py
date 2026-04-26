@@ -221,6 +221,36 @@ Main phase is done as a choice menu with `commander-ability` and `hand` as optio
 
 Each hand has two types of cards `creature` and `spell`. They both cost mana points, which is gained each turn as the game progresses to a max of 10.
 
+
+```markdown
+What changed:
+
+Added server-side game state per room:
+- game_active
+- current_turn
+- commander_health for both players
+- fields for both players
+- round and mana
+Added server functions to run turn-based flow:
+- room/player helpers
+- status broadcasting for both commanders + both fields
+- game-over check (<= 0 health ends game)
+- game start when both players choose decks
+Updated command handling in server.py:
+- DECK <fire|water> now properly handled as its own command
+- PLAY only allowed on active player’s turn; creature plays update server field state
+- ATTACK <damage> applies damage to opponent commander on server
+- ENDTURN passes turn on server (and advances round/mana appropriately)
+Added server status outputs to clients:
+- SERVER:STATUS ... shows commander health, fields, round/mana, and current turn
+- SERVER:TURN ... shows whose turn it is
+- SERVER:GAMEOVER ... sent when either commander reaches 0 or less
+- Updated protocol comments in server.py to match new behavior.
+```
+
+
+
+
 ***
 
 ## End of Document
